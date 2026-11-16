@@ -157,3 +157,15 @@ def date_ranges(start_date, end_date, period):
 
     return date_ranges
 
+
+def fetch_sat_data(date_ranges, aoi_bb, catalog, bands, max_cloud_percent, aoi_percentage_threshold):
+    """Returns a list of geo-DataArrays of the area of interest."""
+    ds_list = [] # Initiate empty list
+    for rng in date_ranges: # Loop over date ranges
+        items = search_Landsat(aoi_bb, rng, max_cloud_percent, catalog) # Obtain items from landsat
+        if len(items) != 0:
+            filtered_items = filter_items(aoi_bb, items, aoi_percentage_threshold/100) # Filter to disragard any that don't capture enough of aoi
+            if len(filtered_items) != 0:
+                ds = load_scene(filtered_items[0], bands, aoi_bb) # Load the scene
+                ds_list.append(ds) # Save the scene to list
+    return ds_list
